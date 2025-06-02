@@ -1,18 +1,11 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:8-jre-alpine
-
-# set shell to bash
-# source: https://stackoverflow.com/a/40944512/3128926
-RUN apk update && apk add bash
-
-# Set the working directory to /app
+# Stage 1: Build the app using Maven
+FROM maven:3.8.7-openjdk-18 AS builder
 WORKDIR /app
-
-# Copy the fat jar into the container at /app
-COPY /target/docker-java-app-example.jar /app
-
-# Make port 8080 available to the world outside this container
+COPY . .
+RUN mvn clean install
+# Stage 2: Use a lightweight JRE image to run the app
+FROM openjdk:18-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/docker-java-app-example.jar /app/
 EXPOSE 8080
-
-# Run jar file when the container launches
 CMD ["java", "-jar", "docker-java-app-example.jar"]
