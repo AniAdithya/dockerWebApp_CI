@@ -4,7 +4,7 @@ WORKDIR /app
 COPY . .
 RUN mvn clean install
 # Stage 2: Use a lightweight JRE image to run the app
-FROM openjdk:18-jre-slim
+FROM adoptopenjdk/openjdk18:jre-18.09
 WORKDIR /app
 COPY --from=builder /app/target/docker-java-app-example.jar /app/
 EXPOSE 8080
